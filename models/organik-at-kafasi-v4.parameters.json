@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "parameters": [
+    {
+      "id": "yukseklik",
+      "label": "Büst yüksekliği",
+      "type": "number",
+      "unit": "mm",
+      "min": 145,
+      "max": 175,
+      "step": 5,
+      "default": 160
+    },
+    {
+      "id": "yele",
+      "label": "Yele ve tutamlar",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "id": "detaylar",
+      "label": "Yüz detayları",
+      "type": "boolean",
+      "default": true
+    }
+  ]
+}

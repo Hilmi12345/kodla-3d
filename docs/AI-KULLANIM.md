@@ -4,6 +4,8 @@ HTTP JSON API rotaları, kararlı hata kodları ve CLI kullanımı: [`docs/HTTP-
 
 Parametreli at profilleri ayrı örneklerdir: `at-kafasi` V1'i, `at-kafasi-v2` ise V2 profil çalışmasını gösterir. Her örneğin şeması `/api/examples` yanıtında taşınır; kodu aynı örnek adı ve parametre nesnesiyle gönder.
 
+`organik-at-kafasi-v4`, V3'ten ayrı SDF örneğidir. `models/organik-at-kafasi-v4.js` içindeki XZ yan konturu bu klonda fotoğraf bulunmadığı için geçici elle çizilmiş tahmindir; Y kalınlık tablosu derinlik tahminidir. Fotoğraf gelince `parameters.referans.konturlar.yan` konturu ana gövdeye aktarılmalı ve `/api/compare` ile gerçek yan IoU ölçülmelidir. İnsan estetik onayı ayrı kapıdır.
+
 Varsayılan çalışma CAD'dir. Organik tasarım için üstteki mod menüsünden **Organik · SDF** seç. JavaScript kodunu `model.js` editörüne yaz, `return model;` ile döndür. Tüm koordinatlar ve ölçüler mm.
 
 Kod, güvenilen yerel kullanıcı kodu olarak gerçek Node JavaScript'te çalışır; bu bir güvenlik sandbox'ı değildir. Dosya/ağ/işletim sistemi erişimi, sonsuz döngü ve dış yan etki yazma. Sunucu tek iş çalıştırır ve 60 saniyede keser.

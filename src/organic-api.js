@@ -258,14 +258,21 @@ export function createOrganicAPI() {
     }
     const maxThickness=Math.max(...outline.map(([x,z])=>thicknessAt(x,z)))+slopeBound*Math.hypot(maxX-minX,maxZ-minZ);
     const bounds={min:[minX,-maxThickness,minZ],max:[maxX,maxThickness,maxZ]};
+    const profileSegments=outline.map((point,i)=>{
+      const next=outline[(i+1)%outline.length],dx=next[0]-point[0],dz=next[1]-point[1];
+      return {ax:point[0],az:point[1],dx,dz,invLength2:1/(dx*dx+dz*dz||1),crossSlope:dz?(dx/dz):0,rayCrosses:dz!==0};
+    });
     const profileDistance=(x,z)=>{
       let inside=false,minDistance=Infinity;
-      for(let i=0,j=outline.length-1;i<outline.length;j=i++){
-        const [ax,az]=outline[j],[bx,bz]=outline[i],dx=bx-ax,dz=bz-az,den=dx*dx+dz*dz,t=den?Math.max(0,Math.min(1,((x-ax)*dx+(z-az)*dz)/den)):0;
-        minDistance=Math.min(minDistance,Math.hypot(x-(ax+t*dx),z-(az+t*dz)));
-        if((az>z)!==(bz>z)&&x<(bx-ax)*(z-az)/(bz-az)+ax)inside=!inside;
+      for(let i=0,j=profileSegments.length-1;i<profileSegments.length;j=i++){
+        const {ax,az,dx,dz,invLength2,crossSlope,rayCrosses}=profileSegments[j],bx=profileSegments[i].ax,bz=profileSegments[i].az;
+        const t=Math.max(0,Math.min(1,((x-ax)*dx+(z-az)*dz)*invLength2));
+        const ex=x-(ax+t*dx),ez=z-(az+t*dz),distance2=ex*ex+ez*ez;
+        if(distance2<minDistance)minDistance=distance2;
+        if(rayCrosses&&(az>z)!==(bz>z)&&x<crossSlope*(z-az)+ax)inside=!inside;
       }
-      return inside?minDistance:-minDistance;
+      const distance=Math.sqrt(minDistance);
+      return inside?distance:-distance;
     };
     const depthScale=Math.hypot(1,slopeBound),blendWidth=rounding*4;
     const field=p=>{

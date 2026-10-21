@@ -95,7 +95,7 @@ function updateReferenceOverlay() {
   referenceOverlay.style.transform = `translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) scale(${scale})`;
 }
 function updateReferencePanel() {
-  const enabled = $('examples').value === 'at-kafasi';
+    const enabled = ['at-kafasi', 'organik-at-kafasi-v4'].includes($('examples').value);
   $('reference-panel').hidden = !enabled;
   if (!enabled) {
     referenceOverlay.hidden = true;
@@ -165,7 +165,7 @@ function frame(view = $('view-select')?.value || 'iso', sizeOverride = null, bou
     const limitingFov = Math.min(verticalFov, horizontalFov);
     distance = fitRadius * 1.15 / Math.sin(limitingFov / 2);
   }
-  const horseExamples = ['at-kafasi', 'at-kafasi-v2', 'organik-at-kafasi-v3'];
+  const horseExamples = ['at-kafasi', 'at-kafasi-v2', 'organik-at-kafasi-v3', 'organik-at-kafasi-v4'];
   const directions = horseExamples.includes(activeExample)
     ? { iso: [1, -1.5, 1.1], front: [1, 0, 0], back: [-1, 0, 0], right: [0, 1, 0], left: [0, -1, 0], top: [0, 0, 1] }
     : { iso: [1, -1.5, 1.1], front: [0, -1, 0], back: [0, 1, 0], right: [1, 0, 0], left: [-1, 0, 0], top: [0, 0, 1] };
@@ -377,7 +377,7 @@ function updateReferenceWarning(){const depthKnown=referenceItems.some(item=>ite
 function mountingHoleData(){return $('mounting-holes').value.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).map((line,index)=>{const values=line.split(/[;,\s]+/).map(Number);if(values.length!==3||!values.every(Number.isFinite)||values[2]<=0)throw new Error(`Montaj deliği ${index+1}: x,y,çap mm girin.`);return {x:values[0],y:values[1],cap:values[2]};});}
 function toReferenceInput(item){if(item.polygon?.length>=3)return {poligon:{width:item.imageWidth,height:item.imageHeight,noktalar:item.polygon}};return item.mask?{maske:item.data}:{gorsel:item.data,anahtar:{esik:48}};}
 async function renderPdfReferencePage(item,page){if(!Number.isInteger(page)||page<1||page>(item.pdfPageCount||1))throw new Error(`PDF sayfası 1 ile ${item.pdfPageCount||1} arasında olmalı.`);const response=await fetch(`/api/reference/pdf-page?page=${page}`,{method:'POST',headers:{'Content-Type':'application/pdf'},body:item.pdfFile});if(!response.ok){const error=await response.json();throw new Error(error.error||'PDF sayfası çevrilemedi.');}const blob=await response.blob();item.data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});item.pdfPage=Number(response.headers.get('X-PDF-Page'))||page;item.pdfPageCount=Number(response.headers.get('X-PDF-Page-Count'))||item.pdfPageCount;item.name=`${item.pdfName}-sayfa-${item.pdfPage}.png`;item.polygon=[];item.mask=false;}
-function referenceCamera(view,example=activeExample){if(['at-kafasi','at-kafasi-v2','organik-at-kafasi-v3'].includes(example))return view==='side'?'right':view;return view==='front'?{direction:[0,-1,0],up:[0,0,1]}:view==='side'?{direction:[1,0,0],up:[0,0,1]}:{direction:[0,0,1],up:[0,1,0]};}
+function referenceCamera(view,example=activeExample){if(['at-kafasi','at-kafasi-v2','organik-at-kafasi-v3','organik-at-kafasi-v4'].includes(example))return view==='side'?'right':view;return view==='front'?{direction:[0,-1,0],up:[0,0,1]}:view==='side'?{direction:[1,0,0],up:[0,0,1]}:{direction:[0,0,1],up:[0,1,0]};}
 async function collectReferenceBrief(){
   if(!referenceItems.length)return undefined;
   const konturlar={};
@@ -1061,7 +1061,7 @@ async function init() {
     if (!response.ok) throw new Error('Örnekler alınamadı.');
     samples = await response.json();
     $('project-open').disabled = false;
-    const titles = { kutu: 'Açık kutu · CAD', aparat: 'Bağlantı aparatı · CAD', 'at-kafasi': 'At kafası · referans', 'at-kafasi-v2': 'At kafası · CAD V2', 'organik-at-kafasi-v3': 'At kafası · organik V3', 'organik-boyun': 'Boyun ve baş · SDF' };
+      const titles = { kutu: 'Açık kutu · CAD', aparat: 'Bağlantı aparatı · CAD', 'at-kafasi': 'At kafası · referans', 'at-kafasi-v2': 'At kafası · CAD V2', 'organik-at-kafasi-v3': 'At kafası · organik V3', 'organik-at-kafasi-v4': 'At kafası · organik V4', 'organik-boyun': 'Boyun ve baş · SDF' };
     samples.forEach(sample => { const option = document.createElement('option'); option.value = sample.name; option.textContent = titles[sample.name] || sample.name; $('examples').appendChild(option); });
     let saved, savedMode, savedQuality, savedCadMeshQuality, savedExample;
     try { saved = localStorage.getItem('kodla3d:source:js'); savedMode = localStorage.getItem('kodla3d:mode'); savedQuality = localStorage.getItem('kodla3d:quality'); savedCadMeshQuality = localStorage.getItem('kodla3d:cad-mesh-quality'); savedExample = localStorage.getItem('kodla3d:example'); } catch {}

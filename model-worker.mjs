@@ -123,7 +123,7 @@ function manifoldMeshToStl(shape) {
     if (!Number.isInteger(count) || count === 0) throw new Error('Organik model boş mesh üretti.');
     const output = Buffer.alloc(84 + count * 50);
     output.write('Kodla3D Manifold SDF mesh; mm', 0, 80, 'ascii');
-    output.writeUInt32LE(count, 80);
+    let kept = 0, removedDegenerate = 0;
     const vertex = index => {
       const offset = index * mesh.numProp;
       const value = [mesh.vertProperties[offset], mesh.vertProperties[offset + 1], mesh.vertProperties[offset + 2]];
@@ -138,12 +138,14 @@ function manifoldMeshToStl(shape) {
       const v = c.map((x, k) => x - a[k]);
       const normal = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
       const length = Math.hypot(...normal);
-      if (length === 0) throw new Error(`Organik mesh sıfır alanlı üçgen içeriyor: ${i}.`);
-      const offset = 84 + i * 50;
+      if (length === 0) { removedDegenerate++; continue; }
+      const offset = 84 + kept * 50;
       for (let axis = 0; axis < 3; axis++) output.writeFloatLE(normal[axis] / length, offset + 4 + axis * 4);
       for (const [corner, point] of [a, b, c].entries()) for (let axis = 0; axis < 3; axis++) output.writeFloatLE(point[axis], offset + 12 + corner * 12 + axis * 4);
+      kept++;
     }
-    return { bytes: output, triangles: count, removedDegenerate: 0 };
+    output.writeUInt32LE(kept, 80);
+    return { bytes: output.subarray(0, 84 + kept * 50), triangles: kept, removedDegenerate };
   } finally {}
 }
 function topologyCounts(shape) {
@@ -273,14 +275,14 @@ try {
     const organicMeshReport = analyzeBinaryStl(stl.bytes);
     if (organicMeshReport.status === 'invalid') throw new Error('Organik STL boş veya sonlu olmayan koordinat içeriyor; dışa aktarım durduruldu.');
     const organicSnapshot = meshSnapshot(organicMeshReport);
-    const meshReport = { ...organicMeshReport, repair: { applied: false, method: 'Manifold STL çıktısı değiştirilmedi.', removedDegenerateTriangles: 0, before: organicSnapshot, after: organicSnapshot } };
+    const meshReport = { ...organicMeshReport, repair: { applied: stl.removedDegenerate > 0, method: 'Yalnız sıfır alanlı üçgenler STL yazımında atlanır; vertex birleştirme veya agresif kapatma yok.', removedDegenerateTriangles: stl.removedDegenerate, before: { ...organicSnapshot, triangles: stl.triangles + stl.removedDegenerate }, after: organicSnapshot } };
     markPhase('diskWrite');
     await writeFile(path.join(folder, 'model.stl'), stl.bytes);
     await writeFile(path.join(folder,'views.png'),visual.bytes);
     result = {
       ok: true, schemaVersion: MODEL_SCHEMA_VERSION, apiVersion: api.apiVersion, geometryType: 'organic', unit: 'mm', name: model.ad,
       size, bbox, volume, components: solidCount, faces: 0,
-      mesh: { triangles: stl.triangles, removedDegenerate: 0, surfaceComponents: solidCount, ...topology },
+      mesh: { triangles: stl.triangles, removedDegenerate: stl.removedDegenerate, surfaceComponents: solidCount, ...topology },
       meshReport, visual:{ format:'png', file:'views.png', width:visual.width, height:visual.height, cameras:visual.cameras, triangles:visual.triangles, renderer:visual.renderer, bytes:visual.bytes.length },
       engine: { name: 'Manifold SDF / WASM', version: '3.5.4' },
       quality: { preset: qualityName, edgeLengthMm, estimatedGridCells, maxGridCells },
