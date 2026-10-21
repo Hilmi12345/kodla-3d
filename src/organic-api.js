@@ -155,7 +155,8 @@ export function createOrganicAPI() {
     if (!Array.isArray(parcalar) || parcalar.length < 2) throw new Error('Yumusak birlesim en az iki parca ister.');
     const forms = parcalar.map((value, i) => requireForm(value, `parcalar[${i}]`));
     const width = positive(genislik, 'genislik');
-    const bounds = combineBounds(forms, width * (forms.length - 1) * 0.5);
+    // smoothMax her adımda en çok width/4 ekler; (n-1) adımlık zincir için kesin üst sınır budur.
+    const bounds = combineBounds(forms, width * (forms.length - 1) * 0.25);
     const field = p => forms.slice(1).reduce((distance, form) => smoothMax(distance, form.field(p), width), forms[0].field(p));
     const ids = forms.flatMap(form => form.nodes.map(node => node.id));
     if (new Set(ids).size !== ids.length) throw new Error('Birleşimde yinelenen parça kimliği var; her kaynak parça benzersiz id taşımalı.');

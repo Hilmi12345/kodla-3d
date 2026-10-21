@@ -1,5 +1,12 @@
 # Kodla 3D geliştirme günlüğü
 
+### 2026-10-22 · Doku — V3 at kafası yeniden kurgu, organik sınır kutusu, temiz klon
+
+- `models/organik-at-kafasi-v3.js` yeniden yazıldı. Eski sürüm zürafa/hortum gibi görünüyordu: yüz tek kapsül, boyun kafadan ince, kaide elipsoit (tabanı tek noktadan değiyordu), model enine 0,8 sıkıştırılmıştı, göz oyuk açılarak yapılmıştı. Yenisinde kaide alttan kesilerek düz taban (z=0), sıkıştırma yok, kalın ve kavisli boyun + tepe kavisi, kafatası → daralan burun sırtı → genişleyen burun ucu zinciri, dolgun ganaş, çukur içinde kabartma göz ve boyun boyunca yele var. Normal kalite: 119,7×39,4×159,4 mm, 210.128 üçgen, 1 kapalı bileşen, 193,3 cm³. Hâlâ stilize; fiziksel baskı denenmedi.
+- `src/organic-api.js`: `yumusakBirlestir` sınır payı `genislik·(n−1)·0,5` → `·0,25`. smoothMax her adımda en çok genislik/4 ekliyor; eski pay iç içe birleşimlerde katlanıp kutuyu şişiriyordu.
+- `model-worker.mjs`: organik modda örnekleme öncesi iki aşamalı alan taraması (`tightOrganicBounds`): kaba tarama + kutu yüzlerinde 3× ince dilim taraması. Bütçe tahmini ve levelSet artık modelin gerçek kapladığı kutuyu kullanıyor (V3'te 9,6M → bütçe içi). Tarama ~1–2 sn.
+- `scripts/create-at-kafasi-v2.mjs`, `scripts/verify-at-kafasi-v2.mjs`: `outputs/` repoda olmadığı için temiz klonda `referans.jpg` ve V1 manifest'i yoktu ve `build:horse-v2`/`verify:horse-v2`/`verify:exchange-reopen` çöküyordu. Referans artık isteğe bağlı; yoksa manifest referanssız üretilir.
+
 ### 2026-10-21 · Luna R5 — referans brifi ve proje paketi
 
 - `index.html`, `src/main.js`, `src/style.css`: 1–3 yerel PNG/JPEG görünüşü, her görünüş için ön/yan/üst kamera, genişlik/yükseklik/derinlik ve açı alanları; montaj delikleri satırları; derinlik tahmini ve montaj oturma garantisi uyarıları eklendi. Referans canvas'ına tıklayarak kapalı poligon çizilip temizlenebilir; en az üç nokta olunca R2 polygon maskesi kullanılır. Bilinen ölçü varsa kontur üretim sırasında `parameters.referans.konturlar` olarak worker'a taşınıyor.

@@ -59,6 +59,32 @@ function validateSourceSyntax(source) {
     throw error;
   }
 }
+// API bounds are conservative (nested smooth-union padding compounds). Shrink them with a field scan
+// so the sampling budget reflects the real shape. A sample counts when its field is within one step
+// of the surface; a 1.25-step margin covers the ≤0.87-step gap to the nearest sample (1-Lipschitz
+// field). Pass 1 is coarse over the declared box; pass 2 rescans only thin slabs at the faces of
+// that result with a 3× finer step. Never grows past the declared bounds.
+function scanOrganicBounds(field, box, step, slab = Infinity) {
+  const extent = box.max.map((v, i) => v - box.min[i]);
+  const counts = extent.map(length => Math.ceil(length / step) + 1);
+  const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < counts[0]; i++) for (let j = 0; j < counts[1]; j++) for (let k = 0; k < counts[2]; k++) {
+    const p = [i, j, k].map((n, axis) => Math.min(box.max[axis], box.min[axis] + n * step));
+    if (slab !== Infinity && p.every((v, axis) => v - box.min[axis] > slab && box.max[axis] - v > slab)) continue;
+    if (!(field(p) > -step)) continue;
+    for (let axis = 0; axis < 3; axis++) { if (p[axis] < min[axis]) min[axis] = p[axis]; if (p[axis] > max[axis]) max[axis] = p[axis]; }
+  }
+  if (!Number.isFinite(min[0])) return null;
+  return { min: min.map((v, axis) => Math.max(box.min[axis], v - 1.25 * step)), max: max.map((v, axis) => Math.min(box.max[axis], v + 1.25 * step)) };
+}
+function tightOrganicBounds(field, bounds) {
+  const step = Math.max(...bounds.max.map((v, i) => v - bounds.min[i])) / 60;
+  if (!(step > 0) || !Number.isFinite(step)) return bounds;
+  const coarse = scanOrganicBounds(field, bounds, step);
+  if (!coarse) return bounds;
+  // Extremes sit within 2.25 coarse steps of the coarse box faces.
+  return scanOrganicBounds(field, coarse, step / 3, 2.5 * step) || coarse;
+}
 function sha256(value) { return createHash('sha256').update(value).digest('hex'); }
 function reserveOutput(name, bytes) {
   const size = typeof bytes === 'number' ? bytes : bytes?.byteLength;
@@ -218,18 +244,19 @@ try {
     if (!model.visible) throw new Error('Model görünür değil; STL için en az bir görünür parça gerekir.');
     if (!(qualityName in qualityProfiles)) throw new Error('Kalite taslak, normal veya ince olmalı.');
     const edgeLengthMm = qualityProfiles[qualityName];
-    const extent = model.bounds.max.map((v, i) => v - model.bounds.min[i]);
+    const bounds = tightOrganicBounds(model.field, model.bounds);
+    const extent = bounds.max.map((v, i) => v - bounds.min[i]);
     const estimatedGridCells = extent.reduce((product, length) => product * Math.ceil(length / edgeLengthMm), 1) * 2;
     const maxGridCells = 4_000_000;
     if (!Number.isFinite(estimatedGridCells) || estimatedGridCells > maxGridCells) throw new Error(`Organik örnekleme bütçesi aşıldı (${Math.ceil(estimatedGridCells).toLocaleString('tr-TR')} hücre tahmini; sınır ${maxGridCells.toLocaleString('tr-TR')}). Taslak kalite seçin veya modeli küçültün.`);
     // The level-set grid must fully enclose the model; sample all 26 points on its box boundary.
     for (let x = 0; x < 3; x++) for (let y = 0; y < 3; y++) for (let z = 0; z < 3; z++) {
       if (x !== 0 && x !== 2 && y !== 0 && y !== 2 && z !== 0 && z !== 2) continue;
-      const point = [0, 1, 2].map((axis, i) => model.bounds.min[axis] + (model.bounds.max[axis] - model.bounds.min[axis]) * [x, y, z][i] / 2);
+      const point = [0, 1, 2].map((axis, i) => bounds.min[axis] + (bounds.max[axis] - bounds.min[axis]) * [x, y, z][i] / 2);
       if (model.field(point) > 1e-6) throw new Error('Organik model örnekleme sınırına taşıyor; bounds içine sığdırın.');
     }
     markPhase('levelSetAndMeshing');
-    outputShape = wasmInstance.Manifold.levelSet(model.field, model.bounds, edgeLengthMm);
+    outputShape = wasmInstance.Manifold.levelSet(model.field, bounds, edgeLengthMm);
     markPhase('validationAndMeasurement');
     if (String(outputShape.status()) !== 'NoError' || outputShape.isEmpty() || !Number.isFinite(outputShape.volume()) || outputShape.volume() <= 0) throw new Error(`Manifold geçerli hacim üretemedi: ${outputShape.status()}.`);
     const components = outputShape.decompose();

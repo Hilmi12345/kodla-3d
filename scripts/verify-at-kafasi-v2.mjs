@@ -14,7 +14,8 @@ const [report,manifest,source,stl,step,png,reference]=await Promise.all([
   readFile(path.join(dir,'at-kafasi-v2.stl')),
   readFile(path.join(dir,'at-kafasi-v2.step')),
   readFile(path.join(dir,'at-kafasi-v2-gorunumler.png')),
-  readFile(path.join(dir,'referans.jpg'))
+  // referans.jpg repoda yok; temiz klonda create betiği referanssız manifest üretir.
+  readFile(path.join(dir,'referans.jpg')).catch(error=>{if(error.code==='ENOENT')return null;throw error;})
 ]);
 assert.equal(report.ok,true);
 assert.equal(report.model,'at-kafasi-v2');
@@ -35,7 +36,8 @@ assert.ok(step.subarray(0,32).toString('ascii').startsWith('ISO-10303-21;'));
 assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10]);
 assert.equal(png.readUInt32BE(16),720);
 assert.equal(png.readUInt32BE(20),408);
-assert.equal(createHash('sha256').update(reference).digest('hex'),report.referenceSha256);
+if(reference)assert.equal(createHash('sha256').update(reference).digest('hex'),report.referenceSha256);
+else assert.equal(report.referenceSha256,null);
 assert.equal(manifest.format,'kodla3d-project');
 assert.equal(manifest.model.example,'at-kafasi-v2');
 assert.equal(manifest.model.source,source);

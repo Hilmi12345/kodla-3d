@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import os from 'node:os';
@@ -58,14 +59,16 @@ try{
   await writeFile(path.join(dir,'at-kafasi-v2.step'),step);
   await writeFile(path.join(dir,'at-kafasi-v2-gorunumler.png'),png);
   await writeFile(path.join(dir,'at-kafasi-v1-ayni-kamera.png'),oldPng);
+  // outputs/ repoda yok: temiz klonda referans fotoğrafı ve V1 manifest'i olmayabilir.
   const reference=path.join(dir,'referans.jpg');
-  await copyFile(path.join(root,'outputs','at-kafasi','referans.jpg'),reference);
-  const referenceHash=createHash('sha256').update(await readFile(reference)).digest('hex');
-  const manifest=JSON.parse(await readFile(path.join(root,'outputs','at-kafasi','at-kafasi-calisma.kodla3d.json'),'utf8'));
+  const sourceReference=path.join(root,'outputs','at-kafasi','referans.jpg');
+  const referenceHash=existsSync(sourceReference)?(await copyFile(sourceReference,reference),createHash('sha256').update(await readFile(reference)).digest('hex')):null;
+  const sourceManifest=path.join(root,'outputs','at-kafasi','at-kafasi-calisma.kodla3d.json');
+  const manifest=existsSync(sourceManifest)?JSON.parse(await readFile(sourceManifest,'utf8')):{format:'kodla3d-project',projectVersion:1,engine:{cad:'Replicad / OpenCascade WASM 1.1.0',organic:'Manifold SDF 3.5.4',apiVersion:1,resultSchemaVersion:1}};
   const model={source:next.code,mode:'cad',quality:'normal',example:'at-kafasi-v2',parameters:next.parameters};
   manifest.metadata={name:'at-kafasi-v2',savedAt:new Date().toISOString()};
   manifest.model=model;
-  manifest.references=[{path:'outputs/at-kafasi-v2/referans.jpg',sha256:referenceHash,attribution:'Doğukan tarafından sağlanan yerel referans; lisans kaydı yok.'}];
+  manifest.references=referenceHash?[{path:'outputs/at-kafasi-v2/referans.jpg',sha256:referenceHash,attribution:'Doğukan tarafından sağlanan yerel referans; lisans kaydı yok.'}]:[];
   manifest.view={camera:'iso',projection:'perspective'};
   manifest.versions=[{id:JSON.stringify(model),savedAt:new Date().toISOString(),label:`V2 · ${r.size.map(n=>n.toFixed(1)).join('×')} mm · ${(r.volume/1000).toFixed(2)} cm³`,model,result:{sourceHash:r.sourceHash,size:r.size,volume:r.volume}}];
   await writeFile(path.join(dir,'at-kafasi-v2.kodla3d.json'),JSON.stringify(manifest,null,2));
