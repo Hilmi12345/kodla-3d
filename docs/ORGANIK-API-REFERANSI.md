@@ -12,6 +12,7 @@ Bu dosya `src/api-schema.js` kaynağından üretilir.
 | `kure({id?, ad?, merkez?, yaricap?})` | Analitik signed-distance küresi üretir. |
 | `elipsoid({id?, ad?, merkez?, yariCaplar?})` | Yaklaşık signed-distance elipsoidi üretir. |
 | `kapsul({id?, ad?, baslangic, bitis, yaricap?, baslangicYaricapi?, bitisYaricapi?})` | Sabit veya değişken yarıçaplı tüp/kapsül üretir. |
+| `kesitZinciri({id?, ad?, noktalar, kesitler, yumusaklik?})` | Catmull-Rom merkez eğrisi boyunca değişken eliptik kesitli organik hacim üretir. |
 | `yumusakBirlestir({ad?, parcalar, genislik?})` | Parçaları gerçek SDF smooth union ile birleştirir. |
 | `yumusakCikar({ad?, ana, kesici, genislik?})` | Ana hacimden kesiciyi yumuşak SDF farkıyla çıkarır. |
 | `grup({id?, ad?, parcalar})` | Parçaları mantıksal grupta toplar. |

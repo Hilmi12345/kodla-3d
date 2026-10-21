@@ -1,5 +1,12 @@
 # Kodla 3D geliştirme günlüğü
 
+### 2026-10-22 · Luna V4 H1 — organik kesit zinciri
+
+- `src/organic-api.js`: `kesitZinciri` eklendi. Catmull–Rom merkez eğrisi, değişken döndürülmüş eliptik kesitler ve kesit arası geçişleri örneklenmiş 1-Lipschitz alanların birleşimiyle üretir. İki eş dairesel kesitte kapsül alanını tam kullanır. API şeması, worker erişimi ve kullanım belgesi güncellendi.
+- Yeni test: `scripts/verify-organic-loft.mjs` / `verify:organic-loft`; sabit kapsül alanı farkı, 10.000 rastgele Lipschitz çifti ve değişken kesitli S eğrisinin normal kalite kapalı mesh üretimini ölçer.
+- Temiz klon regresyonunda `verify:exchange-reopen` mevcut `outputs/at-kafasi-v2` dosyalarına bağlandığı için başarısızdı. İzole wrapper artık bu fixture'ı geçici output kökünde kuruyor; doğrulayıcı da `KODLA3D_OUTPUT_ROOT` kullanıyor. Üretim çıktısı değiştirilmez.
+- Ölçüm: kapsül farkı 0 mm; 10.000 çiftte en yüksek Lipschitz oranı 0,9614; S loft 1 kapalı bileşen, 17.008 üçgen, worker 2.240 ms. H1 sonrasında 22/22 `verify:*` geçti.
+
 ### 2026-10-22 · Doku — V3 at kafası yeniden kurgu, organik sınır kutusu, temiz klon
 
 - `models/organik-at-kafasi-v3.js` yeniden yazıldı. Eski sürüm zürafa/hortum gibi görünüyordu: yüz tek kapsül, boyun kafadan ince, kaide elipsoit (tabanı tek noktadan değiyordu), model enine 0,8 sıkıştırılmıştı, göz oyuk açılarak yapılmıştı. Yenisinde kaide alttan kesilerek düz taban (z=0), sıkıştırma yok, kalın ve kavisli boyun + tepe kavisi, kafatası → daralan burun sırtı → genişleyen burun ucu zinciri, dolgun ganaş, çukur içinde kabartma göz ve boyun boyunca yele var. Normal kalite: 119,7×39,4×159,4 mm, 210.128 üçgen, 1 kapalı bileşen, 193,3 cm³. Hâlâ stilize; fiziksel baskı denenmedi.

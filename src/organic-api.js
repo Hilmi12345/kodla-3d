@@ -151,6 +151,74 @@ export function createOrganicAPI() {
     return makePart({ id, ad, field, bounds, type: 'capsule', parameters: { start: a, end: b, startRadiusMm: rA, endRadiusMm: rB } });
   }
 
+  function kesitZinciri({ id, ad = 'kesit_zinciri', noktalar, kesitler, yumusaklik = 0 } = {}) {
+    if (!Array.isArray(noktalar) || noktalar.length < 2) throw new Error('kesitZinciri en az iki [x,y,z] noktası ister.');
+    if (!Array.isArray(kesitler) || kesitler.length !== noktalar.length) throw new Error('kesitler uzunluğu noktalar ile eşleşmeli.');
+    const points = noktalar.map((point, i) => vector(point, `noktalar[${i}]`));
+    const sections = kesitler.map((section, i) => {
+      if (!section || typeof section !== 'object') throw new Error(`kesitler[${i}] nesne olmalı.`);
+      return { rx: positive(section.rx, `kesitler[${i}].rx`), ry: positive(section.ry, `kesitler[${i}].ry`), angle: finite(section.aci ?? 0, `kesitler[${i}].aci`) * Math.PI / 180 };
+    });
+    const softness = finite(yumusaklik, 'yumusaklik');
+    if (softness < 0) throw new Error('yumusaklik negatif olamaz.');
+    if (points.some((point, i) => i && Math.hypot(...point.map((v, a) => v - points[i - 1][a])) < 1e-8)) throw new Error('kesitZinciri ardışık eş noktaları kabul etmez.');
+
+    const catmull = (p0, p1, p2, p3, t) => p1.map((v, axis) => 0.5 * ((2 * v) + (-p0[axis] + p2[axis]) * t + (2*p0[axis] - 5*v + 4*p2[axis] - p3[axis]) * t*t + (-p0[axis] + 3*v - 3*p2[axis] + p3[axis]) * t*t*t));
+    const rawSamples = [];
+    const minRadius = Math.min(...sections.flatMap(section => [section.rx, section.ry]));
+    for (let segment = 0; segment < points.length - 1; segment++) {
+      const p0 = points[Math.max(0, segment - 1)], p1 = points[segment], p2 = points[segment + 1], p3 = points[Math.min(points.length - 1, segment + 2)];
+      const chord = Math.hypot(...p2.map((v, axis) => v - p1[axis]));
+      const count = Math.max(4, Math.min(48, Math.ceil(chord / Math.max(0.5, minRadius * 0.35))));
+      for (let j = segment ? 1 : 0; j <= count; j++) {
+        const t = j / count, center = catmull(p0, p1, p2, p3, t);
+        const tangent = catmull(p0, p1, p2, p3, Math.min(1, t + 1e-3)).map((v, axis) => v - catmull(p0, p1, p2, p3, Math.max(0, t - 1e-3))[axis]);
+        const tangentLength = Math.hypot(...tangent) || 1;
+        const T = tangent.map(v => v / tangentLength);
+        let U = [-T[1], T[0], 0];
+        let uLength = Math.hypot(...U);
+        if (uLength < 1e-6) { U = [1, 0, 0]; uLength = 1; }
+        U = U.map(v => v / uLength);
+        const V = [T[1]*U[2]-T[2]*U[1], T[2]*U[0]-T[0]*U[2], T[0]*U[1]-T[1]*U[0]];
+        const sectionA = sections[segment], sectionB = sections[segment + 1];
+        const rx = sectionA.rx + (sectionB.rx - sectionA.rx) * t, ry = sectionA.ry + (sectionB.ry - sectionA.ry) * t;
+        const angle = sectionA.angle + (sectionB.angle - sectionA.angle) * t;
+        const c = Math.cos(angle), s = Math.sin(angle), rotatedU = U.map((v, axis) => c*v + s*V[axis]), rotatedV = V.map((v, axis) => -s*U[axis] + c*V[axis]);
+        rawSamples.push({ center, T, U: rotatedU, V: rotatedV, rx, ry });
+      }
+    }
+    const samples = rawSamples.map((sample, i) => {
+      const before = i ? Math.hypot(...sample.center.map((v, axis) => v - rawSamples[i - 1].center[axis])) : 0;
+      const after = i + 1 < rawSamples.length ? Math.hypot(...sample.center.map((v, axis) => v - rawSamples[i + 1].center[axis])) : 0;
+      return { ...sample, axial: Math.max(minRadius, (before + after) * 0.55 + softness) };
+    });
+    const bounds = { min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
+    for (const sample of samples) for (let axis = 0; axis < 3; axis++) {
+      const extent = Math.hypot(sample.T[axis] * sample.axial, sample.U[axis] * sample.rx, sample.V[axis] * sample.ry);
+      bounds.min[axis] = Math.min(bounds.min[axis], sample.center[axis] - extent);
+      bounds.max[axis] = Math.max(bounds.max[axis], sample.center[axis] + extent);
+    }
+    // Each sample is a conservative 1-Lipschitz ellipsoid field; max preserves that bound.
+    const field = p => {
+      let result = -Infinity;
+      for (const sample of samples) {
+        const dx = p[0]-sample.center[0], dy = p[1]-sample.center[1], dz = p[2]-sample.center[2];
+        const axial = (dx*sample.T[0]+dy*sample.T[1]+dz*sample.T[2])/sample.axial;
+        const u = (dx*sample.U[0]+dy*sample.U[1]+dz*sample.U[2])/sample.rx;
+        const v = (dx*sample.V[0]+dy*sample.V[1]+dz*sample.V[2])/sample.ry;
+        const local = Math.min(sample.axial, sample.rx, sample.ry) * (1 - Math.hypot(axial, u, v));
+        if (local > result) result = local;
+      }
+      return result;
+    };
+    // Preserve the exact capsule field for the canonical two-point circular case.
+    if (points.length === 2 && sections[0].rx === sections[0].ry && sections[1].rx === sections[1].ry && sections[0].rx === sections[1].rx) {
+      const a=points[0], b=points[1], ab=b.map((v,i)=>v-a[i]), length2=ab.reduce((sum,v)=>sum+v*v,0), radius=sections[0].rx;
+      return makePart({ id, ad, bounds, type: 'section-chain', parameters: { points, sections, softness }, field: p => { const t=Math.max(0,Math.min(1,p.reduce((sum,v,i)=>sum+(v-a[i])*ab[i],0)/length2)); return radius-Math.hypot(...p.map((v,i)=>v-(a[i]+ab[i]*t))); } });
+    }
+    return makePart({ id, ad, field, bounds, type: 'section-chain', parameters: { points, sections, softness } });
+  }
+
   function yumusakBirlestir({ ad = 'yumusak_birlesim', parcalar = [], genislik = 2 } = {}) {
     if (!Array.isArray(parcalar) || parcalar.length < 2) throw new Error('Yumusak birlesim en az iki parca ister.');
     const forms = parcalar.map((value, i) => requireForm(value, `parcalar[${i}]`));
@@ -329,7 +397,7 @@ export function createOrganicAPI() {
     return derivedPart(hedef,{field,operations:[...(hedef.nodes.at(-1)?.operations||[]),{type:'surface-cavity',name:ad,center:vector(merkez,'merkez'),radiiMm:vector(yariCaplar,'yariCaplar'),blendMm:blend,actualGeometry:true}]});
   }
 
-  return { apiVersion: ORGANIC_API_VERSION, OrganikParca, kure, elipsoid, kapsul, yumusakBirlestir, yumusakCikar, grup, gorunum, tasi, donustur, simetrik, parcaBul, parcaDegistir, bolgeselSekillendir, egriDetayi, gozKapagi, dudakCizgisi, yeleTutami, burunDeligi };
+  return { apiVersion: ORGANIC_API_VERSION, OrganikParca, kure, elipsoid, kapsul, kesitZinciri, yumusakBirlestir, yumusakCikar, grup, gorunum, tasi, donustur, simetrik, parcaBul, parcaDegistir, bolgeselSekillendir, egriDetayi, gozKapagi, dudakCizgisi, yeleTutami, burunDeligi };
 }
 
 

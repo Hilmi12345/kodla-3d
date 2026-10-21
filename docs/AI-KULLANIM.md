@@ -65,6 +65,7 @@ return yumusakBirlestir({ ad: 'boyun_ve_bas', parcalar: [boyun, kafa], genislik:
 - `kure({ad, merkez:[x,y,z], yaricap})`: analitik küre alanı.
 - `elipsoid({ad, merkez:[x,y,z], yariCaplar:[rx,ry,rz]})`: yaklaşık signed-distance alanı.
 - `kapsul({ad, baslangic:[x,y,z], bitis:[x,y,z], yaricap, baslangicYaricapi, bitisYaricapi})`: eksen boyunca sabit veya değişken yarıçap.
+- `kesitZinciri({id, ad, noktalar:[[x,y,z],...], kesitler:[{rx,ry,aci?},...], yumusaklik})`: Catmull–Rom merkez eğrisi boyunca dik eliptik kesitleri yumuşakça birleştirir. `rx` yanal, `ry` dikey yarıçaptır; `aci` kesiti dereceyle çevirir. Alan, sabit örneklenmiş 1-Lipschitz elipsoidlerin birleşimidir; iki eş dairesel kesitte kapsül alanını verir.
 - `yumusakBirlestir({ad, parcalar:[...], genislik})`: gerçek smooth SDF max; `genislik` mm cinsinden karışım aralığı.
 - `yumusakCikar({ad, ana, kesici, genislik})`: yumuşatılmış fark/oyuk.
 - Her parçada addan ayrı `id` ver; ad değişse de kimlik aynı kalır. `grup({id, ad, parcalar})` mantıksal ağaç oluşturur; aynı grup içindeki ad/ID çakışması açık hata verir.

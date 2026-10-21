@@ -5,6 +5,7 @@ export const ORGANIC_API_REFERENCE = [
   { name: 'kure', args: '{id?, ad?, merkez?, yaricap?}', purpose: 'Analitik signed-distance küresi üretir.' },
   { name: 'elipsoid', args: '{id?, ad?, merkez?, yariCaplar?}', purpose: 'Yaklaşık signed-distance elipsoidi üretir.' },
   { name: 'kapsul', args: '{id?, ad?, baslangic, bitis, yaricap?, baslangicYaricapi?, bitisYaricapi?}', purpose: 'Sabit veya değişken yarıçaplı tüp/kapsül üretir.' },
+  { name: 'kesitZinciri', args: '{id?, ad?, noktalar, kesitler, yumusaklik?}', purpose: 'Catmull-Rom merkez eğrisi boyunca değişken eliptik kesitli organik hacim üretir.' },
   { name: 'yumusakBirlestir', args: '{ad?, parcalar, genislik?}', purpose: 'Parçaları gerçek SDF smooth union ile birleştirir.' },
   { name: 'yumusakCikar', args: '{ad?, ana, kesici, genislik?}', purpose: 'Ana hacimden kesiciyi yumuşak SDF farkıyla çıkarır.' },
   { name: 'grup', args: '{id?, ad?, parcalar}', purpose: 'Parçaları mantıksal grupta toplar.' },

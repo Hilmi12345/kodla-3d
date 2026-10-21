@@ -40,7 +40,8 @@ async function buildAndReopen(name){
 
 const evidence=[];
 for(const name of ['kutu','aparat']) evidence.push(await buildAndReopen(name));
-const horseDirectory=path.join(root,'outputs','at-kafasi-v2');
+const outputRoot=process.env.KODLA3D_OUTPUT_ROOT?path.resolve(process.env.KODLA3D_OUTPUT_ROOT):path.join(root,'outputs');
+const horseDirectory=path.join(outputRoot,'at-kafasi-v2');
 const horseMetrics=JSON.parse(await readFile(path.join(horseDirectory,'DOGRULAMA.json'),'utf8'));
 const [horseStepBytes,horseStlBytes]=await Promise.all([
   readFile(path.join(horseDirectory,'at-kafasi-v2.step')),
