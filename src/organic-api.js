@@ -157,7 +157,26 @@ export function createOrganicAPI() {
     const width = positive(genislik, 'genislik');
     // smoothMax her adımda en çok width/4 ekler; (n-1) adımlık zincir için kesin üst sınır budur.
     const bounds = combineBounds(forms, width * (forms.length - 1) * 0.25);
-    const field = p => forms.slice(1).reduce((distance, form) => smoothMax(distance, form.field(p), width), forms[0].field(p));
+    // Culling: outside a form's bounds by more than `width`, its field is below -width, so it
+    // cannot change smoothMax near the surface (|a-b| >= width there). Skipping it keeps the
+    // zero level set exact; only far-away values (already negative) may differ.
+    const boxes = forms.map(form => ({ min: form.bounds.min.map(v => v - width), max: form.bounds.max.map(v => v + width) }));
+    const near = (box, p) => p[0] >= box.min[0] && p[0] <= box.max[0] && p[1] >= box.min[1] && p[1] <= box.max[1] && p[2] >= box.min[2] && p[2] <= box.max[2];
+    const boxGap = (box, p) => Math.hypot(...p.map((v, i) => Math.max(box.min[i] - v, 0, v - box.max[i])));
+    const field = p => {
+      let distance = -Infinity;
+      for (let i = 0; i < forms.length; i++) {
+        if (!near(boxes[i], p)) continue;
+        const value = forms[i].field(p);
+        distance = distance === -Infinity ? value : smoothMax(distance, value, width);
+      }
+      if (distance !== -Infinity) return distance;
+      // Far from every form: the nearest form's own field keeps the value distance-like
+      // (a box-gap guess overestimates badly when bounds are loose, e.g. after rotation).
+      let nearest = 0;
+      for (let i = 1; i < forms.length; i++) if (boxGap(boxes[i], p) < boxGap(boxes[nearest], p)) nearest = i;
+      return Math.min(forms[nearest].field(p), -width);
+    };
     const ids = forms.flatMap(form => form.nodes.map(node => node.id));
     if (new Set(ids).size !== ids.length) throw new Error('Birleşimde yinelenen parça kimliği var; her kaynak parça benzersiz id taşımalı.');
     return makePart({ ad, field, bounds, type: 'smooth-union', parameters: { blendMm: width, sourceIds: forms.map(form => form.id) }, children: forms });
