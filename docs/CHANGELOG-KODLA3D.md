@@ -26,6 +26,12 @@
 - Yeni test: `scripts/verify-horse-v4-performance.mjs` / `verify:horse-v4-performance`; V4 normal worker süresini <45 sn ve STL hacmini H4 öncesi 272.283,5238 mm³ değerinin ±%0,1 içinde tutar. V3 ölçümü aynı betiğe örnek adı vererek alınabilir.
 - Ölçüm: V3 24.222 ms; V4 H4 öncesi 46.533 ms, sonrası 9.652 ms (tekrar 9.965 ms). V4 hacmi 272.283,5238 → 272.284,2790 mm³; fark %0,000277; boyut 85,962×36×159,978 mm aynı. Ayrıntı [`docs/BASELINE.md`](BASELINE.md).
 
+### 2026-10-22 · Luna V4 H5 — baskı geometrisi regresyonları
+
+- `scripts/verify-horse-v4.mjs` / `verify:horse-v4` artık 160±0,5 mm yükseklik, tek kapalı bileşen, açık/non-manifold 0, kafa ön oranı 0,35–0,45, normal üretim <45 sn ve altı görünüş PNG'sini birlikte doğrular.
+- STL'de z<0,2 mm tüm üçgenlerin izdüşüm alanı kaide izdüşüm alanının %80'inden büyük olmalı; bu üretimde 1.972,08 / 1.992,35 mm² = %98,98 ölçüldü. Referans fotoğrafı yoksa test fotoğraf IoU'sunu açıkça atlar.
+- H5 doğrulaması: 1 bileşen, açık kenar 0, non-manifold 0; yükseklik 159,978 mm; worker 9.718 ms; referans durumu “photo unavailable; IoU skipped”.
+
 ### 2026-10-22 · Doku — V3 at kafası yeniden kurgu, organik sınır kutusu, temiz klon
 
 - `models/organik-at-kafasi-v3.js` yeniden yazıldı. Eski sürüm zürafa/hortum gibi görünüyordu: yüz tek kapsül, boyun kafadan ince, kaide elipsoit (tabanı tek noktadan değiyordu), model enine 0,8 sıkıştırılmıştı, göz oyuk açılarak yapılmıştı. Yenisinde kaide alttan kesilerek düz taban (z=0), sıkıştırma yok, kalın ve kavisli boyun + tepe kavisi, kafatası → daralan burun sırtı → genişleyen burun ucu zinciri, dolgun ganaş, çukur içinde kabartma göz ve boyun boyunca yele var. Normal kalite: 119,7×39,4×159,4 mm, 210.128 üçgen, 1 kapalı bileşen, 193,3 cm³. Hâlâ stilize; fiziksel baskı denenmedi.
