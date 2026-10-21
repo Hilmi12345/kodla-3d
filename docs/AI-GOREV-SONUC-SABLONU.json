@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "kodla3d-short-tasks-v1",
+  "run": {
+    "runId": null,
+    "startedAt": null,
+    "taskId": null,
+    "model": {
+      "invoked": false,
+      "provider": null,
+      "name": null,
+      "version": null,
+      "systemPromptHash": null
+    },
+    "context": {
+      "promptUtf8Bytes": null,
+      "promptCharacters": null,
+      "contextFiles": [],
+      "contextUtf8Bytes": null,
+      "contextCharacters": null,
+      "providerTokenCount": null,
+      "tokenCountSource": null
+    },
+    "attempts": {
+      "firstValidAttempt": null,
+      "totalModelReplies": null,
+      "revisionRequests": null,
+      "wallMs": null,
+      "coldStart": null
+    },
+    "codeResult": {
+      "status": "not_run",
+      "httpStatus": null,
+      "errorCode": null,
+      "sourceHash": null,
+      "validFormats": [],
+      "meshReportStatus": null
+    },
+    "designResult": {
+      "status": "not_run",
+      "score0to4": null,
+      "criteria": [],
+      "correctTargetPart": null,
+      "measurementErrorsMm": {},
+      "visualReviewer": null,
+      "visualScore1to5": null,
+      "visualNotes": null
+    },
+    "outcome": "not_run",
+    "failureClass": null,
+    "notes": "Protokol hazırlanmış olabilir; gerçek model çağrısı yapılmadıysa invoked=false ve not_run korunur."
+  },
+  "runs": []
+}

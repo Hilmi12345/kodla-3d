@@ -1,0 +1,49 @@
+{
+  "name": "kodla-3d",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "start": "node server.mjs",
+    "api:docs": "node scripts/generate-organic-api-reference.mjs",
+    "verify:api": "node scripts/verify-isolated.mjs scripts/verify-organic-api-reference.mjs",
+    "verify:silhouette": "node scripts/verify-isolated.mjs scripts/verify-silhouette.mjs",
+    "verify:reference-mask": "node scripts/verify-isolated.mjs scripts/verify-reference-mask.mjs",
+    "verify:reference-compare": "node scripts/verify-isolated.mjs scripts/verify-reference-compare.mjs",
+    "verify:reference-contour": "node scripts/verify-isolated.mjs scripts/verify-reference-contour.mjs",
+    "verify:reference-r7": "node scripts/verify-isolated.mjs scripts/verify-reference-r7.mjs",
+    "verify:cad": "node scripts/verify-isolated.mjs scripts/verify-cad-authoring.mjs",
+    "verify:sweep": "node scripts/verify-isolated.mjs scripts/verify-cad-sweep.mjs",
+    "verify:parameters": "node scripts/verify-isolated.mjs scripts/verify-parameter-schema.mjs",
+    "verify:glb": "node scripts/verify-isolated.mjs --glb scripts/verify-glb-file.mjs",
+    "verify:project": "node scripts/verify-isolated.mjs scripts/verify-project-manifest.mjs",
+    "verify:parts": "node scripts/verify-isolated.mjs scripts/verify-part-tree.mjs",
+    "verify:cad-provenance": "node scripts/verify-isolated.mjs scripts/verify-cad-provenance.mjs",
+    "verify:at-part-provenance": "node scripts/verify-isolated.mjs scripts/verify-at-part-provenance.mjs",
+    "verify:mesh-report": "node scripts/verify-isolated.mjs scripts/verify-mesh-report.mjs",
+    "verify:exchange-reopen": "node scripts/verify-isolated.mjs scripts/verify-exchange-reopen.mjs",
+    "verify:jobs": "node scripts/verify-isolated.mjs --self-server scripts/verify-job-lifecycle.mjs",
+    "verify:horse-v2": "node scripts/verify-isolated.mjs --horse-v2 scripts/verify-at-kafasi-v2.mjs",
+    "build:horse-v2": "node scripts/create-at-kafasi-v2.mjs",
+    "verify:fixtures": "node scripts/verify-isolated.mjs --self-server scripts/verify-ai-fixtures.mjs",
+    "benchmark:cache": "node scripts/benchmark-cache.mjs",
+    "kodla3d": "node scripts/kodla3d.mjs",
+    "verify:reference-docs": "node scripts/verify-isolated.mjs scripts/verify-reference-docs.mjs",
+    "verify:pdf-reference": "node scripts/verify-isolated.mjs scripts/verify-pdf-reference.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.88",
+    "jpeg-js": "0.4.4",
+    "manifold-3d": "3.5.4",
+    "pdfjs-dist": "5.4.624",
+    "pngjs": "7.0.0",
+    "replicad": "1.1.0",
+    "replicad-opencascadejs": "1.1.0",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7"
+  }
+}

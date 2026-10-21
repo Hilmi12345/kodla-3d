@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-20T23:46:26.224Z",
+  "port": 20144,
+  "successExamples": [
+    {
+      "id": "cad-box",
+      "status": "passed",
+      "example": "kutu",
+      "mode": "cad",
+      "size": [
+        80,
+        50,
+        25
+      ],
+      "solids": 1,
+      "components": null,
+      "triangles": 1052,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "step",
+        "js"
+      ],
+      "sourceHash": "c1478e7a7d97f97c772549517bd0211671a1b9de15c045a8d1c1a175a2221969"
+    },
+    {
+      "id": "cad-hole-bracket",
+      "status": "passed",
+      "example": "aparat",
+      "mode": "cad",
+      "size": [
+        70,
+        40,
+        35
+      ],
+      "solids": 1,
+      "components": null,
+      "triangles": 1036,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "step",
+        "js"
+      ],
+      "sourceHash": "96d6f8e4a1a2fede03c636f54a1aa1abbccbbb61b2f9ed5680d2435cf69e5698"
+    },
+    {
+      "id": "cad-revolved-profile",
+      "status": "passed",
+      "example": "profil-dondur",
+      "mode": "cad",
+      "size": [
+        20,
+        20,
+        18
+      ],
+      "solids": 1,
+      "components": null,
+      "triangles": 1634,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "step",
+        "js"
+      ],
+      "sourceHash": "be396276bf476ff556b913d66dffc07bab116037f96ae8fcd55cf44462451f25"
+    },
+    {
+      "id": "organic-neck",
+      "status": "passed",
+      "example": "organik-boyun",
+      "mode": "organic",
+      "size": [
+        17.986446724568758,
+        11.003848028080753,
+        34.98905605534578
+      ],
+      "solids": null,
+      "components": 1,
+      "triangles": 9560,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "js"
+      ],
+      "sourceHash": "2ffd8728101a5318f1fff788289a2b0b3218be832f3ef246eff68947c17f1ecc"
+    },
+    {
+      "id": "organic-face-details",
+      "status": "passed",
+      "example": "organik-detay",
+      "mode": "organic",
+      "size": [
+        28.997632101373217,
+        16.271292333746715,
+        31.997596418503154
+      ],
+      "solids": null,
+      "components": 1,
+      "triangles": 15866,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "js"
+      ],
+      "sourceHash": "d4b0fd087c4e02bf6f66f3c075fb8c6944c676f518a519c50ff9ee7372b42246"
+    },
+    {
+      "id": "organic-local-sculpt",
+      "status": "passed",
+      "example": "organik-bolgesel",
+      "mode": "organic",
+      "size": [
+        26.32829694620695,
+        17.994235001360366,
+        32
+      ],
+      "solids": null,
+      "components": 1,
+      "triangles": 16322,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "js"
+      ],
+      "sourceHash": "10a63991918f23ea0f5c211fa6cfbe100f9c2b9167ca0722d61e6d71882fa9b6"
+    },
+    {
+      "id": "organic-curved-handle",
+      "status": "passed",
+      "example": "organik-sap",
+      "mode": "organic",
+      "size": [
+        30.61202775868128,
+        9.236970488486811,
+        60.98588540487882
+      ],
+      "solids": null,
+      "components": 1,
+      "triangles": 14256,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "js"
+      ],
+      "sourceHash": "f610781eccc29ff5ce708f357e2aa6f5730d325600f4e03da274e01d7933932c"
+    },
+    {
+      "id": "organic-symmetry",
+      "status": "passed",
+      "example": "organik-simetri",
+      "mode": "organic",
+      "size": [
+        13.986636237461408,
+        2.9893949612830184,
+        9.993995816885647
+      ],
+      "solids": null,
+      "components": 2,
+      "triangles": 1536,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "formats": [
+        "stl",
+        "js"
+      ],
+      "sourceHash": "46fc928d6f3cde0b11c4be60bde8f2c08e26b127cb4cd559bbba08f28356766f"
+    }
+  ],
+  "edgeCases": [
+    {
+      "id": "empty-source",
+      "status": "passed",
+      "http": 400,
+      "code": "MODEL_CODE_REQUIRED"
+    },
+    {
+      "id": "separate-shells",
+      "status": "passed",
+      "http": 200,
+      "components": 2,
+      "connectedComponents": 2
+    },
+    {
+      "id": "sub-resolution-sphere",
+      "status": "passed",
+      "http": 422,
+      "code": "GEOMETRY_BUILD_FAILED",
+      "error": "Manifold geçerli hacim üretemedi: NoError."
+    },
+    {
+      "id": "grid-budget-overflow",
+      "status": "passed",
+      "http": 422,
+      "errorCode": "GEOMETRY_BUILD_FAILED",
+      "error": "Organik örnekleme bütçesi aşıldı (121.211.669.504 hücre tahmini; sınır 4.000.000). Taslak kalite seçin veya modeli küçültün."
+    },
+    {
+      "id": "invalid-v2-parameter",
+      "status": "passed",
+      "http": 400,
+      "code": "INVALID_REQUEST",
+      "parameterPath": "yanakDolgunlugu"
+    },
+    {
+      "id": "worker-crash",
+      "status": "passed",
+      "http": 500,
+      "code": "WORKER_CRASHED"
+    },
+    {
+      "id": "cad-after-crash-recovery",
+      "status": "passed",
+      "example": "kutu",
+      "triangles": 1052
+    }
+  ],
+  "scope": {
+    "limitations": [
+      "minimum wall thickness, supports/overhang, yazıcı/nozul profili",
+      "self-intersection için tam mesh testi",
+      "fiziksel baskı toleransı ve dayanımı",
+      "fotoğrafa göre anatomik benzerlik için kullanıcı görsel kabulü"
+    ],
+    "realSmallModelRun": false,
+    "userVisualApproval": false,
+    "physicalPrint": false
+  }
+}

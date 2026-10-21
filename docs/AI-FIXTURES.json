@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Yalnız bir örnek ailesine göre başarıyı varsaymamak; ortak API'de CAD/organik üretim ve hata sınırlarını ölçmek.",
+  "additionalVerifiedArtifacts": [
+    { "id": "horse-v2-cad", "path": "outputs/at-kafasi-v2/DOGRULAMA.json", "verifiedBy": "npm run verify:horse-v2" }
+  ],
+  "successExamples": [
+    { "id": "cad-box", "example": "kutu", "mode": "cad", "quality": "normal", "expected": { "solids": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "cad-hole-bracket", "example": "aparat", "mode": "cad", "quality": "normal", "expected": { "solids": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "cad-revolved-profile", "example": "profil-dondur", "mode": "cad", "quality": "normal", "expected": { "solids": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "organic-neck", "example": "organik-boyun", "mode": "organic", "quality": "normal", "expected": { "components": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "organic-face-details", "example": "organik-detay", "mode": "organic", "quality": "normal", "expected": { "components": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "organic-local-sculpt", "example": "organik-bolgesel", "mode": "organic", "quality": "normal", "expected": { "components": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "organic-curved-handle", "example": "organik-sap", "mode": "organic", "quality": "normal", "expected": { "components": 1, "mesh": "complete-and-nonempty" } },
+    { "id": "organic-symmetry", "example": "organik-simetri", "mode": "organic", "quality": "normal", "expected": { "components": 2, "mesh": "complete-and-nonempty" } }
+  ],
+  "edgeCases": [
+    { "id": "empty-source", "kind": "request", "expectedHttp": 400, "expectedCode": "MODEL_CODE_REQUIRED", "limit": "Boş kaynak worker'a başlatılmaz." },
+    { "id": "separate-shells", "kind": "geometry", "mode": "organic", "expectedComponents": 2, "limit": "Ayrı kabuklar raporlanır, otomatik birleştirilmiş katı sayılmaz." },
+    { "id": "sub-resolution-sphere", "kind": "resolution-probe", "mode": "organic", "quality": "normal", "expectedHttp": 422, "expectedCode": "GEOMETRY_BUILD_FAILED", "limit": "0.2 mm çap normal SDF örneği yüzey/kapalı hacim üretemeyerek hata verir; minimum özellik boyutu için genel garanti yoktur." },
+    { "id": "grid-budget-overflow", "kind": "resolution", "mode": "organic", "quality": "ince", "expectedHttp": 422, "expectedCode": "GEOMETRY_BUILD_FAILED", "limit": "4 milyon hücre sınırı aşılırsa açık hata; kalite sessiz düşürülmez." },
+    { "id": "invalid-v2-parameter", "kind": "parameter", "expectedHttp": 400, "expectedCode": "INVALID_REQUEST", "parameterPath": "yanakDolgunlugu", "limit": "V2 şema aralığı dışındaki değer worker'a ulaşmaz." },
+    { "id": "worker-crash", "kind": "process", "expectedHttp": 500, "expectedCode": "WORKER_CRASHED", "limit": "Worker kapanır; server yeniden CAD üretebilmelidir. Ayrı lifecycle verifier da bu toparlanmayı test eder." }
+  ],
+  "notCovered": [
+    "minimum wall thickness, supports/overhang, yazıcı/nozul profili",
+    "self-intersection için tam mesh testi",
+    "fiziksel baskı toleransı ve dayanımı",
+    "fotoğrafa göre anatomik benzerlik için kullanıcı görsel kabulü"
+  ]
+}

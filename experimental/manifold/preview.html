@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manifold SDF teknik önizleme</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#10150f;color:#edf1e8;font:14px system-ui,sans-serif;padding:18px}h1{font-size:20px;margin:0 0 6px}p{color:#aeb8a3;margin:0 0 16px}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{background:#1c2419;border:1px solid #35422f;border-radius:12px;overflow:hidden}.label{padding:10px 12px;font-weight:650}.view{height:min(56vh,440px);min-height:300px;position:relative;background:#d9ddcf}.view canvas{display:block;width:100%;height:100%}.view-status{position:absolute;left:8px;bottom:8px;padding:4px 7px;border-radius:5px;background:#10150fcc;color:#edf1e8;font-size:11px}.view-status.error{background:#8b241d;color:white}.sub{padding:8px 12px;color:#aeb8a3;font-size:12px}@media(max-width:800px){.row{grid-template-columns:1fr}.view{height:38vh}}
+  </style>
+</head>
+<body>
+  <h1>Gerçek geometri karşılaştırması</h1>
+  <p>Aynı SDF, çözünürlük ve kamera. Solda sert Boolean; sağda implicit-field smooth union. Döndürme iki kameraya da uygulanır.</p>
+  <div class="row">
+    <section class="panel"><div class="label">Sert Boolean birleşimi</div><div id="hard" class="view"></div><div class="sub">Manifold.union · aynı iki küre · STL</div></section>
+    <section class="panel"><div class="label">Yumuşak SDF birleşimi</div><div id="soft" class="view"></div><div class="sub">Manifold.levelSet · smooth max, 4 mm · STL</div></section>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <section class="panel"><div class="label">Kavisli boyun ve baş</div><div id="neck" class="view"></div><div class="sub">Değişken yarıçaplı kapsüller + yumuşak baş birleşimi · STL</div></section>
+    <section class="panel"><div class="label">Aynı modelin yan silueti</div><div id="side" class="view"></div><div class="sub">Profil görünüşü · aynı mesh ve ölçek</div></section>
+  </div>
+  <script type="module" src="/experimental/manifold/preview.js"></script>
+</body>
+</html>

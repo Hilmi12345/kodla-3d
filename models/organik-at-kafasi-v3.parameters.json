@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "parameters": [
+    {
+      "id": "yukseklik",
+      "label": "Büst yüksekliği",
+      "type": "number",
+      "unit": "mm",
+      "min": 120,
+      "max": 190,
+      "step": 5,
+      "default": 160
+    }
+  ]
+}

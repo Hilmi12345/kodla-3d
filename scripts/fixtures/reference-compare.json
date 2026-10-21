@@ -1,0 +1,7 @@
+{
+  "mode": "cad",
+  "code": "return kutu({ad:'r9-box',genislik:80,derinlik:50,yukseklik:25});",
+  "referans": {"poligon": {"width": 100, "height": 80, "noktalar": [[10,15],[90,15],[90,65],[10,65]]}},
+  "kamera": "top",
+  "olcek": {"genislikMm": 80}
+}

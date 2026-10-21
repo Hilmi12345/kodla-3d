@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "parameters": [
+    {
+      "id": "yukseklik",
+      "label": "Büst yüksekliği",
+      "type": "number",
+      "unit": "mm",
+      "min": 120,
+      "max": 190,
+      "step": 5,
+      "default": 160
+    },
+    {
+      "id": "kulakUzunlugu",
+      "label": "Kulak uzunluğu",
+      "type": "number",
+      "unit": "mm",
+      "min": 24,
+      "max": 52,
+      "step": 1,
+      "default": 39
+    },
+    {
+      "id": "yele",
+      "label": "Yele kabartısı",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "id": "detaylar",
+      "label": "Yüz detayları",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "id": "burunAcisi",
+      "label": "Burun profili açısı",
+      "type": "angle",
+      "unit": "°",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "id": "yanakDolgunlugu",
+      "label": "Yanak ve çene hacmi",
+      "type": "number",
+      "unit": "mm",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "default": 12
+    }
+  ]
+}

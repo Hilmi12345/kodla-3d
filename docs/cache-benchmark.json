@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-10-19T15:40:18.544Z",
+  "method": "Five identical 30x20x10 mm CAD builds on an isolated local server; first worker run compared with four in-memory cache restorations. Wall time includes request/response and STL fetch+hash.",
+  "models": 1,
+  "repeats": 5,
+  "firstRunWallMs": 1216.2618000000002,
+  "warmMedianWallMs": 15.364000000000033,
+  "medianWallMs": 15.364000000000033,
+  "samples": [
+    {
+      "run": 1,
+      "cacheHit": false,
+      "wallMs": 1216.2618000000002,
+      "cacheRestoreMs": null,
+      "workerMs": 508.6575,
+      "stlBytes": 684,
+      "stlSha256": "a70d8c8ce46267a92045880c7fb7fbc046eb1c814e1f4e3796874b206a5186eb"
+    },
+    {
+      "run": 2,
+      "cacheHit": true,
+      "wallMs": 29.03950000000009,
+      "cacheRestoreMs": 6,
+      "workerMs": 508.6575,
+      "stlBytes": 684,
+      "stlSha256": "a70d8c8ce46267a92045880c7fb7fbc046eb1c814e1f4e3796874b206a5186eb"
+    },
+    {
+      "run": 3,
+      "cacheHit": true,
+      "wallMs": 14.042099999999891,
+      "cacheRestoreMs": 6,
+      "workerMs": 508.6575,
+      "stlBytes": 684,
+      "stlSha256": "a70d8c8ce46267a92045880c7fb7fbc046eb1c814e1f4e3796874b206a5186eb"
+    },
+    {
+      "run": 4,
+      "cacheHit": true,
+      "wallMs": 12.936500000000024,
+      "cacheRestoreMs": 6,
+      "workerMs": 508.6575,
+      "stlBytes": 684,
+      "stlSha256": "a70d8c8ce46267a92045880c7fb7fbc046eb1c814e1f4e3796874b206a5186eb"
+    },
+    {
+      "run": 5,
+      "cacheHit": true,
+      "wallMs": 15.364000000000033,
+      "cacheRestoreMs": 5,
+      "workerMs": 508.6575,
+      "stlBytes": 684,
+      "stlSha256": "a70d8c8ce46267a92045880c7fb7fbc046eb1c814e1f4e3796874b206a5186eb"
+    }
+  ],
+  "cacheStats": {
+    "entries": 1,
+    "maxEntries": 8,
+    "bytes": 17119,
+    "hits": 4,
+    "misses": 1,
+    "implementationHash": "dcc1263dd661da2e4c6509426978cfc8b8b3566f30c254dcb5a51ca22b9046bb",
+    "referenceAssetHash": "3721da1b7b7a641333bbb6607864e5ded8a959e3f44b924b998cca9aebeb4e52"
+  }
+}

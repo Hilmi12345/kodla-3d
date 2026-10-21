@@ -1,0 +1,9 @@
+.venv/
+node_modules/
+dist/
+.runtime/
+vendor/
+__pycache__/
+*.pyc
+outputs/
+*.bak
