@@ -25,3 +25,15 @@ RSS değeri uygulama worker prosesi için gözlenen en yüksek örnektir; sistem
 Ölçüm betiği kaynak JS'in SHA-256'sini, API sonucu, üçgen sayısı ve üretilen STL dosyasının SHA-256/byte sayısını JSON'a yazar. Önceki `docs/DOGRULAMA.md` CAD kayıtları kutu/aparat STEP yeniden açma ve hacim eşitliğini doğrulamıştı; bu benchmark STEP round-trip'i tekrar çalıştırıp süre tutmuyor. Fiziksel baskı ve baskı dayanımı test edilmedi.
 
 Makine üzerindeki tam soğuk uygulama başlangıcı, tepe bellek için 20 ms altındaki kısa olaylar ve STL üçgenleme ile dosyaya yazmanın ayrı süreleri bu ölçümde yok. Bu değerler hedef değil, T01 başlangıç referansıdır.
+
+## At kafası V3/V4 normal kalite (22 Ekim 2026)
+
+İzole API sunucusunda birer normal kalite üretim; worker süresi `profile.workerTotalMs`, hacim API mesh ölçümüdür. V4 ilk H3 ölçümü iyileştirme öncesi, ikinci ölçümü H4 sonrası aynı model kodu/parametreleri ve aynı makinede alındı. Bu H4 karşılaştırması için STL mesh hacmi ±%0,1 içinde tutuldu.
+
+| Örnek | Worker süresi | Hacim (mm³) | BBox (mm) | Üçgen |
+|---|---:|---:|---|---:|
+| At kafası V3 | 24,222 sn | 215.498,884 | 114,081×39,450×159,797 | — |
+| At kafası V4, H4 öncesi | 46,533 sn | 272.283,524 | 85,962×36,000×159,978 | 224.158 |
+| At kafası V4, H4 sonrası | 9,652 sn | 272.284,279 | 85,962×36,000×159,978 | 224.084 |
+
+V4 hacim farkı 0,000277%; kabul sınırı %0,1. H4 sonrası tekrar doğrulaması 9,965 sn sürdü. H4 dışındaki sonraki aşamalarda kalite/süre ölçümleri değişebilir; bu kayıt normal kalite tek worker örnekleridir.

@@ -433,18 +433,31 @@ export function createOrganicAPI() {
     if (!['kabartma','oyuk'].includes(etki)) throw new Error('Eğri detayı etki kabartma veya oyuk olmalı.');
     const blend=positive(genislik,'genislik');
     const segments=points.slice(0,-1).map((a,index)=>{
-      const b=points[index+1],ab=b.map((value,i)=>value-a[i]),lengthSquared=ab.reduce((sum,value)=>sum+value*value,0);
+      const b=points[index+1],dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2],lengthSquared=dx*dx+dy*dy+dz*dz;
       if(lengthSquared===0)throw new Error(`noktalar[${index}] ve noktalar[${index+1}] aynı olamaz.`);
-      return {a,b,ab,lengthSquared,rA:radii[index],rB:radii[index+1]};
+      return {ax:a[0],ay:a[1],az:a[2],dx,dy,dz,lengthSquared,rA:radii[index],rB:radii[index+1]};
     });
-    const curveField=p=>segments.reduce((best,segment)=>{
-      const ap=p.map((value,i)=>value-segment.a[i]);const t=Math.max(0,Math.min(1,ap.reduce((sum,value,i)=>sum+value*segment.ab[i],0)/segment.lengthSquared));
-      const nearest=segment.a.map((value,i)=>value+segment.ab[i]*t);const localRadius=segment.rA+(segment.rB-segment.rA)*t;
-      return Math.max(best,localRadius-Math.hypot(...p.map((value,i)=>value-nearest[i])));
-    },-Infinity);
-    const toolBounds={min:[0,1,2].map(axis=>Math.min(...points.map(point=>point[axis]))-Math.max(...radii)-blend),max:[0,1,2].map(axis=>Math.max(...points.map(point=>point[axis]))+Math.max(...radii)+blend)};
+    const curveField=p=>{
+      let best=-Infinity;
+      for(const segment of segments){
+        const qx=p[0]-segment.ax,qy=p[1]-segment.ay,qz=p[2]-segment.az;
+        const t=Math.max(0,Math.min(1,(qx*segment.dx+qy*segment.dy+qz*segment.dz)/segment.lengthSquared));
+        const ex=qx-segment.dx*t,ey=qy-segment.dy*t,ez=qz-segment.dz*t;
+        const value=segment.rA+(segment.rB-segment.rA)*t-Math.hypot(ex,ey,ez);
+        if(value>best)best=value;
+      }
+      return best;
+    };
+    const toolPadding=Math.max(...radii)+blend;
+    const toolBounds={min:[Infinity,Infinity,Infinity],max:[-Infinity,-Infinity,-Infinity]};
+    for(const point of points)for(let axis=0;axis<3;axis++){
+      toolBounds.min[axis]=Math.min(toolBounds.min[axis],point[axis]-toolPadding);
+      toolBounds.max[axis]=Math.max(toolBounds.max[axis],point[axis]+toolPadding);
+    }
+    // Beyond this expanded box the curve field is at most -blend, so it cannot move the zero surface.
+    const outsideTool=p=>p[0]<toolBounds.min[0]||p[0]>toolBounds.max[0]||p[1]<toolBounds.min[1]||p[1]>toolBounds.max[1]||p[2]<toolBounds.min[2]||p[2]>toolBounds.max[2];
     const bounds=etki==='kabartma'?combineBounds([hedef,{bounds:toolBounds}],blend):hedef.bounds;
-    const field=etki==='kabartma'?p=>smoothMax(hedef.field(p),curveField(p),blend):p=>-smoothMax(-hedef.field(p),curveField(p),blend);
+    const field=etki==='kabartma'?p=>outsideTool(p)?hedef.field(p):smoothMax(hedef.field(p),curveField(p),blend):p=>outsideTool(p)?hedef.field(p):-smoothMax(-hedef.field(p),curveField(p),blend);
     const operation={type:'curve-detail',name:ad||'eğri-detayı',effect:etki,points,radiiMm:radii,blendMm:blend,actualGeometry:true};
     return derivedPart(hedef,{field,bounds,operations:[...(hedef.nodes.at(-1)?.operations||[]),operation]});
   }

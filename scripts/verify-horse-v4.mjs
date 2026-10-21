@@ -44,4 +44,4 @@ const visualResponse = await fetch(`${base}${result.files.visual}`);
 assert.equal(visualResponse.status, 200);
 const visual = Buffer.from(await visualResponse.arrayBuffer());
 assert.deepEqual([...visual.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
-console.log(JSON.stringify({ status: 'passed', example: example.name, sizeMm: result.size, components: result.components, triangles: result.mesh.triangles, frontHeadRatio, workerMs: result.profile.workerTotalMs, wallMs: Number(wallMs.toFixed(1)), sixViewsPngBytes: visual.length, reference: 'unavailable; IoU skipped' }, null, 2));
+console.log(JSON.stringify({ status: 'passed', example: example.name, sizeMm: result.size, volumeMm3: result.volume, components: result.components, triangles: result.mesh.triangles, frontHeadRatio, workerMs: result.profile.workerTotalMs, phasesMs: result.profile.phasesMs, wallMs: Number(wallMs.toFixed(1)), sixViewsPngBytes: visual.length, reference: 'unavailable; IoU skipped' }, null, 2));

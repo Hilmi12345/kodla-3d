@@ -12,6 +12,7 @@
     "verify:organic-loft": "node scripts/verify-isolated.mjs scripts/verify-organic-loft.mjs",
     "verify:organic-silhouette": "node scripts/verify-isolated.mjs scripts/verify-organic-silhouette.mjs",
     "verify:horse-v4": "node scripts/verify-isolated.mjs scripts/verify-horse-v4.mjs",
+    "verify:horse-v4-performance": "node scripts/verify-isolated.mjs scripts/verify-horse-v4-performance.mjs",
     "verify:silhouette": "node scripts/verify-isolated.mjs scripts/verify-silhouette.mjs",
     "verify:reference-mask": "node scripts/verify-isolated.mjs scripts/verify-reference-mask.mjs",
     "verify:reference-compare": "node scripts/verify-isolated.mjs scripts/verify-reference-compare.mjs",
