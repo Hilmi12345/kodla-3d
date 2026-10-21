@@ -7,6 +7,12 @@
 - Temiz klon regresyonunda `verify:exchange-reopen` mevcut `outputs/at-kafasi-v2` dosyalarına bağlandığı için başarısızdı. İzole wrapper artık bu fixture'ı geçici output kökünde kuruyor; doğrulayıcı da `KODLA3D_OUTPUT_ROOT` kullanıyor. Üretim çıktısı değiştirilmez.
 - Ölçüm: kapsül farkı 0 mm; 10.000 çiftte en yüksek Lipschitz oranı 0,9614; S loft 1 kapalı bileşen, 17.008 üçgen, worker 2.240 ms. H1 sonrasında 22/22 `verify:*` geçti.
 
+### 2026-10-22 · Luna V4 H2 — yan siluetten hacim
+
+- `src/organic-api.js`: `siluetHacmi` kapalı XZ konturunu değişken Y yarı kalınlığına dönüştürür. Tablo girdisi sabit eğim sınırıyla 1-Lipschitz uzatılır; fonksiyon girdisi 24×24 hücrede örneklenip eğim normalize edilir. Yuvarlama pozitif alan kesişimini smooth-min ile yumuşatır. API şeması, worker ve kullanım belgeleri güncellendi.
+- Yeni test: `scripts/verify-organic-silhouette.mjs` / `verify:organic-silhouette`; 80×50×20 mm sentetik kutu, ölçü, 10.000 Lipschitz çifti, kendi konturuyla yan IoU ve kapalı mesh'i denetler.
+- Ölçüm: sentetik kutu 80×20×50 mm; 1 kapalı bileşen, 78.448 üçgen; 10.000 çifte en yüksek Lipschitz oranı 0,9682; kendi kontur IoU 1,000; worker 2.252 ms. Gerçek fotoğraf mevcut olmadığından bu test fotoğraf benzerliği ölçmez.
+
 ### 2026-10-22 · Doku — V3 at kafası yeniden kurgu, organik sınır kutusu, temiz klon
 
 - `models/organik-at-kafasi-v3.js` yeniden yazıldı. Eski sürüm zürafa/hortum gibi görünüyordu: yüz tek kapsül, boyun kafadan ince, kaide elipsoit (tabanı tek noktadan değiyordu), model enine 0,8 sıkıştırılmıştı, göz oyuk açılarak yapılmıştı. Yenisinde kaide alttan kesilerek düz taban (z=0), sıkıştırma yok, kalın ve kavisli boyun + tepe kavisi, kafatası → daralan burun sırtı → genişleyen burun ucu zinciri, dolgun ganaş, çukur içinde kabartma göz ve boyun boyunca yele var. Normal kalite: 119,7×39,4×159,4 mm, 210.128 üçgen, 1 kapalı bileşen, 193,3 cm³. Hâlâ stilize; fiziksel baskı denenmedi.

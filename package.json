@@ -10,6 +10,7 @@
     "api:docs": "node scripts/generate-organic-api-reference.mjs",
     "verify:api": "node scripts/verify-isolated.mjs scripts/verify-organic-api-reference.mjs",
     "verify:organic-loft": "node scripts/verify-isolated.mjs scripts/verify-organic-loft.mjs",
+    "verify:organic-silhouette": "node scripts/verify-isolated.mjs scripts/verify-organic-silhouette.mjs",
     "verify:silhouette": "node scripts/verify-isolated.mjs scripts/verify-silhouette.mjs",
     "verify:reference-mask": "node scripts/verify-isolated.mjs scripts/verify-reference-mask.mjs",
     "verify:reference-compare": "node scripts/verify-isolated.mjs scripts/verify-reference-compare.mjs",

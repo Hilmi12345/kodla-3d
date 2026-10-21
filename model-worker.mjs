@@ -238,7 +238,7 @@ try {
     };
   } else {
     const api = createOrganicAPI();
-    const run = new Function('api', 'parameters', `"use strict"; const {OrganikParca,kure,elipsoid,kapsul,kesitZinciri,yumusakBirlestir,yumusakCikar,grup,gorunum,tasi,donustur,simetrik,parcaBul,parcaDegistir,bolgeselSekillendir,egriDetayi,gozKapagi,dudakCizgisi,yeleTutami,burunDeligi}=api;\n${source}\n;return typeof model !== 'undefined' ? model : null;`);
+    const run = new Function('api', 'parameters', `"use strict"; const {OrganikParca,kure,elipsoid,kapsul,kesitZinciri,siluetHacmi,yumusakBirlestir,yumusakCikar,grup,gorunum,tasi,donustur,simetrik,parcaBul,parcaDegistir,bolgeselSekillendir,egriDetayi,gozKapagi,dudakCizgisi,yeleTutami,burunDeligi}=api;\n${source}\n;return typeof model !== 'undefined' ? model : null;`);
     const model = run(api, parameters);
     if (!(model instanceof api.OrganikParca)) throw new Error('Organik modda kod OrganikParca döndürmeli: return model;');
     if (!model.visible) throw new Error('Model görünür değil; STL için en az bir görünür parça gerekir.');

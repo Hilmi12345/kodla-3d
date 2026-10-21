@@ -219,6 +219,62 @@ export function createOrganicAPI() {
     return makePart({ id, ad, field, bounds, type: 'section-chain', parameters: { points, sections, softness } });
   }
 
+  function siluetHacmi({ id, ad = 'siluet_hacmi', kontur, kalinlik, yuvarlama = 0 } = {}) {
+    if (!Array.isArray(kontur) || kontur.length < 3) throw new Error('siluetHacmi en az üç [x,z] kontur noktası ister.');
+    const outline = kontur.map((point, i) => {
+      if (!Array.isArray(point) || point.length !== 2) throw new Error(`kontur[${i}] [x,z] olmalı.`);
+      return [finite(point[0], `kontur[${i}][0]`), finite(point[1], `kontur[${i}][1]`)];
+    });
+    if (Math.hypot(outline[0][0]-outline.at(-1)[0], outline[0][1]-outline.at(-1)[1]) < 1e-8) outline.pop();
+    if (outline.length < 3) throw new Error('siluetHacmi kapalı, en az üç farklı [x,z] noktası ister.');
+    const rounding = finite(yuvarlama, 'yuvarlama');
+    if (rounding < 0) throw new Error('yuvarlama negatif olamaz.');
+    let minX=Infinity,minZ=Infinity,maxX=-Infinity,maxZ=-Infinity;
+    for(const [x,z] of outline){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minZ=Math.min(minZ,z);maxZ=Math.max(maxZ,z);}
+    if(maxX-minX<1e-8||maxZ-minZ<1e-8)throw new Error('kontur sıfır alanlı veya eksenlerden birine paralel olamaz.');
+    let thicknessAt, slopeBound, thicknessDescription;
+    if (typeof kalinlik === 'function') {
+      const divisions=24, grid=[];let slopeX=0,slopeZ=0;
+      for(let iz=0;iz<=divisions;iz++)for(let ix=0;ix<=divisions;ix++){
+        const x=minX+(maxX-minX)*ix/divisions,z=minZ+(maxZ-minZ)*iz/divisions,r=positive(kalinlik(x,z),`kalinlik(${x},${z})`);
+        grid.push(r);
+        if(ix<divisions)slopeX=Math.max(slopeX,Math.abs(r-positive(kalinlik(minX+(maxX-minX)*(ix+1)/divisions,z),'kalinlik'))/Math.max((maxX-minX)/divisions,1e-9));
+        if(iz<divisions)slopeZ=Math.max(slopeZ,Math.abs(r-positive(kalinlik(x,minZ+(maxZ-minZ)*(iz+1)/divisions),'kalinlik'))/Math.max((maxZ-minZ)/divisions,1e-9));
+      }
+      slopeBound=Math.hypot(slopeX,slopeZ);
+      thicknessAt=(x,z)=>{
+        const gx=Math.max(0,Math.min(divisions,(x-minX)/(maxX-minX||1)*divisions)),gz=Math.max(0,Math.min(divisions,(z-minZ)/(maxZ-minZ||1)*divisions));
+        const ix=Math.min(divisions-1,Math.floor(gx)),iz=Math.min(divisions-1,Math.floor(gz)),tx=gx-ix,tz=gz-iz,at=(xx,zz)=>grid[zz*(divisions+1)+xx];
+        return (at(ix,iz)*(1-tx)+at(ix+1,iz)*tx)*(1-tz)+(at(ix,iz+1)*(1-tx)+at(ix+1,iz+1)*tx)*tz;
+      };
+      thicknessDescription={type:'sampled-function',divisions,slopeBound};
+    } else {
+      if(!Array.isArray(kalinlik)||kalinlik.length<1)throw new Error('kalinlik [x,z,yariKalinlik] tablosu veya fonksiyon olmalı.');
+      const table=kalinlik.map((row,i)=>{if(!Array.isArray(row)||row.length!==3)throw new Error(`kalinlik[${i}] [x,z,yariKalinlik] olmalı.`);return [finite(row[0],`kalinlik[${i}][0]`),finite(row[1],`kalinlik[${i}][1]`),positive(row[2],`kalinlik[${i}][2]`)];});
+      slopeBound=0;
+      for(let i=0;i<table.length;i++)for(let j=0;j<i;j++)slopeBound=Math.max(slopeBound,Math.abs(table[i][2]-table[j][2])/Math.max(1e-9,Math.hypot(table[i][0]-table[j][0],table[i][1]-table[j][1])));
+      thicknessAt=(x,z)=>{let value=Infinity;for(const [tx,tz,r] of table)value=Math.min(value,r+slopeBound*Math.hypot(x-tx,z-tz));return value;};
+      thicknessDescription={type:'table',points:table,slopeBound};
+    }
+    const maxThickness=Math.max(...outline.map(([x,z])=>thicknessAt(x,z)))+slopeBound*Math.hypot(maxX-minX,maxZ-minZ);
+    const bounds={min:[minX,-maxThickness,minZ],max:[maxX,maxThickness,maxZ]};
+    const profileDistance=(x,z)=>{
+      let inside=false,minDistance=Infinity;
+      for(let i=0,j=outline.length-1;i<outline.length;j=i++){
+        const [ax,az]=outline[j],[bx,bz]=outline[i],dx=bx-ax,dz=bz-az,den=dx*dx+dz*dz,t=den?Math.max(0,Math.min(1,((x-ax)*dx+(z-az)*dz)/den)):0;
+        minDistance=Math.min(minDistance,Math.hypot(x-(ax+t*dx),z-(az+t*dz)));
+        if((az>z)!==(bz>z)&&x<(bx-ax)*(z-az)/(bz-az)+ax)inside=!inside;
+      }
+      return inside?minDistance:-minDistance;
+    };
+    const depthScale=Math.hypot(1,slopeBound),blendWidth=rounding*4;
+    const field=p=>{
+      const side=profileDistance(p[0],p[2]),depth=(thicknessAt(p[0],p[2])-Math.abs(p[1]))/depthScale;
+      return blendWidth>0?-smoothMax(-side,-depth,blendWidth):Math.min(side,depth);
+    };
+    return makePart({id,ad,field,bounds,type:'silhouette-volume',parameters:{contour: outline, thickness:thicknessDescription, roundingMm:rounding, depthSlopeBound:slopeBound}});
+  }
+
   function yumusakBirlestir({ ad = 'yumusak_birlesim', parcalar = [], genislik = 2 } = {}) {
     if (!Array.isArray(parcalar) || parcalar.length < 2) throw new Error('Yumusak birlesim en az iki parca ister.');
     const forms = parcalar.map((value, i) => requireForm(value, `parcalar[${i}]`));
@@ -397,7 +453,7 @@ export function createOrganicAPI() {
     return derivedPart(hedef,{field,operations:[...(hedef.nodes.at(-1)?.operations||[]),{type:'surface-cavity',name:ad,center:vector(merkez,'merkez'),radiiMm:vector(yariCaplar,'yariCaplar'),blendMm:blend,actualGeometry:true}]});
   }
 
-  return { apiVersion: ORGANIC_API_VERSION, OrganikParca, kure, elipsoid, kapsul, kesitZinciri, yumusakBirlestir, yumusakCikar, grup, gorunum, tasi, donustur, simetrik, parcaBul, parcaDegistir, bolgeselSekillendir, egriDetayi, gozKapagi, dudakCizgisi, yeleTutami, burunDeligi };
+  return { apiVersion: ORGANIC_API_VERSION, OrganikParca, kure, elipsoid, kapsul, kesitZinciri, siluetHacmi, yumusakBirlestir, yumusakCikar, grup, gorunum, tasi, donustur, simetrik, parcaBul, parcaDegistir, bolgeselSekillendir, egriDetayi, gozKapagi, dudakCizgisi, yeleTutami, burunDeligi };
 }
 
 
