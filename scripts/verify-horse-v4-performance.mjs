@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 
 const base = process.env.KODLA3D_URL || 'http://127.0.0.1:8765';
-const baselineVolumeMm3 = 272283.523761817;
+// 2026-10-22: fotoğraf silüetli V4 sonrası yeni taban hacim.
+const baselineVolumeMm3 = 552598.3497076674;
 const list = await fetch(`${base}/api/examples`);
 assert.equal(list.status, 200);
 const examples = await list.json();

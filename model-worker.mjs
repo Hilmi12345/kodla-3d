@@ -249,7 +249,7 @@ try {
     const bounds = tightOrganicBounds(model.field, model.bounds);
     const extent = bounds.max.map((v, i) => v - bounds.min[i]);
     const estimatedGridCells = extent.reduce((product, length) => product * Math.ceil(length / edgeLengthMm), 1) * 2;
-    const maxGridCells = 4_000_000;
+    const maxGridCells = 9_000_000;
     if (!Number.isFinite(estimatedGridCells) || estimatedGridCells > maxGridCells) throw new Error(`Organik örnekleme bütçesi aşıldı (${Math.ceil(estimatedGridCells).toLocaleString('tr-TR')} hücre tahmini; sınır ${maxGridCells.toLocaleString('tr-TR')}). Taslak kalite seçin veya modeli küçültün.`);
     // The level-set grid must fully enclose the model; sample all 26 points on its box boundary.
     for (let x = 0; x < 3; x++) for (let y = 0; y < 3; y++) for (let z = 0; z < 3; z++) {

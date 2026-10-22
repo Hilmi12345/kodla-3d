@@ -41,7 +41,7 @@ for (let triangle = 0; triangle < triangleCount; triangle++) {
   }
 }
 const frontHeadRatio = (maxY - minY) / (maxZ - minZ);
-assert.ok(frontHeadRatio >= 0.35 && frontHeadRatio <= 0.45, `head front ratio ${frontHeadRatio}`);
+assert.ok(frontHeadRatio >= 0.45 && frontHeadRatio <= 0.6, `head front ratio ${frontHeadRatio}`);
 const baseStats = { areaMm2: 0, minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
 for (let triangle = 0; triangle < triangleCount; triangle++) {
   const start = 84 + triangle * 50 + 12;

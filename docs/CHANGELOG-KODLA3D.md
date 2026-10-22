@@ -487,3 +487,11 @@
 - Beş geometri yinelemesi; yerel üretim+compare işlem toplamı 0,22 dk (manuel düzenleme hariç). Nihai ön/alt/yan bindirmeleri görüntülenip kontrol edildi. STL, elle poligon görüntüleri, compare overlay'leri ve JSON kanıtı `outputs/referans-deneme/` altında.
 - Nihai R7 sonrası tüm 21 `verify:*` komutu geçti. `.runtime/runs` 131 kayıtla önce/sonra aynı; aggregate SHA-256 `1dea1a1087d4dfa63213cf58aaee3aa081d855c86d41721fb36c46afe3bcd35b`.
 
+
+### 2026-10-22 · V4 fotoğraf silüeti — Doğukan onayı
+
+- H6 incelemesinde Doğukan elle çizilmiş profili reddetti (yandan yaprak, önden 36 mm sabit levha). Doğukan'ın verdiği referans fotoğraftan maske çıkarıldı (beyaz zemin eşiği, 9 px açma ile kıl uçları temizlendi, 5 px poligon sadeleştirme), göğüs çapraz kesildi, taban düz. `models/organik-at-kafasi-v4.js` konturu bu 78 noktalık silüettir.
+- Kalınlık bölgesel: ense→burun ekseni boyunca alın/göz 20, burun ucu 12, boyun 19–20, kulak 5 mm yarı kalınlık. Göz, göz kapağı, burun deliği, ağız ve çene hatları fotoğraftaki konumlarda; yele tutamları sağ yanda uzun, sol yanda kısa.
+- Göz kapağı ve yele tutamları yüzeyden taşınca kapalı olmayan (non-manifold) kenar veriyordu; yüzeye gömüldü, tutam başı tepe kenarından 6 mm aşağı alındı. Sonuç 0 açık, 0 non-manifold.
+- Model 161 mm geniş olduğundan `model-worker.mjs` organik hücre bütçesi 4M → 9M. `verify:horse-v4` ön oran aralığı 0,35–0,45 → 0,45–0,60 (gerçek kafa daha dolgun), `verify:horse-v4-performance` taban hacmi 552.598,35 mm³.
+- Ölçüm: 161×43×160 mm, normal worker ~27 sn, kaide kaplama %98,3, yan silüet IoU 0,955 (fotoğraf maskesine karşı). Referans fotoğraf stok görsel (filigranlı) olduğu için repoya eklenmedi; `outputs/at-kafasi/referans.jpg` yerelde kalır.
