@@ -32,6 +32,12 @@
 - STL'de z<0,2 mm tüm üçgenlerin izdüşüm alanı kaide izdüşüm alanının %80'inden büyük olmalı; bu üretimde 1.972,08 / 1.992,35 mm² = %98,98 ölçüldü. Referans fotoğrafı yoksa test fotoğraf IoU'sunu açıkça atlar.
 - H5 doğrulaması: 1 bileşen, açık kenar 0, non-manifold 0; yükseklik 159,978 mm; worker 9.718 ms; referans durumu “photo unavailable; IoU skipped”.
 
+### 2026-10-22 · Luna V4 H6 — yerel gözden geçirme paketi
+
+- `scripts/create-horse-v4-review-package.mjs` / `verify:horse-v4-review-package` normal kalite V4'ü üretip `outputs/at-kafasi-v4/` içine STL, altı görünüş PNG'si, ölçüm JSON'u ve IoU yineleme kaydını yazar. `outputs/` gitignore altında kalır; yerel çıktı commit edilmez.
+- Referans fotoğrafı bu checkout'ta bulunmadığından gerçek `overlayPng` ve fotoğraf IoU'su üretilemedi. Paket bunu `REFERANS-EKSIK.md` ve `iou-yineleme.json` ile açıkça işaretler; sentetik bindirme eklenmedi.
+- Üretilen paket: STL 224.084 üçgen, 272.284,279 mm³; 85,962×36×159,978 mm; altı görünüş PNG 45.196 B. H6 inceleme kapısı: paket Doğukan'a gösteriliyor; V4, Doğukan “oldu” demeden bitmiş sayılmayacak.
+
 ### 2026-10-22 · Doku — V3 at kafası yeniden kurgu, organik sınır kutusu, temiz klon
 
 - `models/organik-at-kafasi-v3.js` yeniden yazıldı. Eski sürüm zürafa/hortum gibi görünüyordu: yüz tek kapsül, boyun kafadan ince, kaide elipsoit (tabanı tek noktadan değiyordu), model enine 0,8 sıkıştırılmıştı, göz oyuk açılarak yapılmıştı. Yenisinde kaide alttan kesilerek düz taban (z=0), sıkıştırma yok, kalın ve kavisli boyun + tepe kavisi, kafatası → daralan burun sırtı → genişleyen burun ucu zinciri, dolgun ganaş, çukur içinde kabartma göz ve boyun boyunca yele var. Normal kalite: 119,7×39,4×159,4 mm, 210.128 üçgen, 1 kapalı bileşen, 193,3 cm³. Hâlâ stilize; fiziksel baskı denenmedi.
